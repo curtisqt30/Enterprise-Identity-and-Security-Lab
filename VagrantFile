@@ -1,0 +1,54 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  # Global Timeout for Windows (it takes a while to boot)
+  config.vm.boot_timeout = 600
+
+  # ============================================
+  # Windows Server 2022 - Domain Controller
+  # ============================================
+  config.vm.define "dc01" do |dc|
+    dc.vm.box = "gusztavvargadr/windows-server-2022-standard"
+    dc.vm.hostname = "DC01"
+    
+    # Internal network for AD communication
+    dc.vm.network "private_network", ip: "192.168.56.10", virtualbox__intnet: "LabNet"
+
+    dc.vm.provider "virtualbox" do |vb|
+      vb.name = "DC01-Server2022"
+      vb.memory = "4096"
+      vb.cpus = 2
+      vb.gui = true
+      # Optimization for Windows performance in VirtualBox
+      vb.customize ["modifyvm", :id, "--vram", "128"]
+      vb.customize ["modifyvm", :id, "--clipboard-mode", "bidirectional"]
+    end
+
+    # Corrected Path: Assumes Vagrantfile is in the root folder
+    dc.vm.provision "shell", path: "scripts/phase1-infrastructure/01-dc-setup.ps1"
+  end
+
+  # ============================================
+  # Windows 10 - Domain Client
+  # ============================================
+  config.vm.define "client01" do |client|
+    client.vm.box = "gusztavvargadr/windows-10"
+    client.vm.hostname = "CLIENT01"
+
+    # Static IP assigned for initial connectivity testing
+    client.vm.network "private_network", ip: "192.168.56.100", virtualbox__intnet: "LabNet"
+
+    client.vm.provider "virtualbox" do |vb|
+      vb.name = "CLIENT01-Win10"
+      vb.memory = "2048"
+      vb.cpus = 2
+      vb.gui = true
+      vb.customize ["modifyvm", :id, "--vram", "128"]
+    end
+
+    # Corrected Path
+    client.vm.provision "shell", path: "scripts/phase1-infrastructure/02-client-setup.ps1"
+  end
+end
