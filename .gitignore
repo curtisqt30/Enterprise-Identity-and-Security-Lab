@@ -1,0 +1,48 @@
+# Virtual Machine Files
+
+# VirtualBox
+*.vbox
+*.vbox-prev
+*.vdi
+*.ova
+*.ovf
+
+# VMware
+*.vmx
+*.vmxf
+*.vmdk
+*.nvram
+*.vmsd
+*.vmsn
+*.vmss
+*.vmem
+*.vmwarevm/
+
+# Vagrant
+.vagrant/
+Vagrantfile.local
+
+# Hyper-V
+*.vhdx
+*.vhd
+*.avhdx
+
+# QEMU/KVM
+*.qcow
+*.qcow2
+*.img
+
+# Parallels
+*.pvm/
+*.pvs
+
+# General VM directories
+/vms/
+/virtual-machines/
+/VMs/
+
+# ISO files (often used for VM setup)
+*.iso
+
+# Snapshot files
+*.snapshot
