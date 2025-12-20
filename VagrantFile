@@ -26,7 +26,6 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--clipboard-mode", "bidirectional"]
     end
 
-    # Corrected Path: Assumes Vagrantfile is in the root folder
     dc.vm.provision "shell", path: "scripts/phase1-infrastructure/01-dc-setup.ps1"
   end
 
@@ -48,7 +47,6 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--vram", "128"]
     end
 
-    # Corrected Path
     client.vm.provision "shell", path: "scripts/phase1-infrastructure/02-client-setup.ps1"
   end
 end
