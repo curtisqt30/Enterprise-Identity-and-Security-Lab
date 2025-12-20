@@ -44,7 +44,6 @@ git clone <repo-url>
 cd <repo-name>
 
 # Start the Domain Controller first
-cd infrastructure/vagrant
 vagrant up dc01
 
 # After DC is ready and rebooted, start the client
@@ -56,26 +55,23 @@ vagrant up client01
 ## Directory Structure
 
 ```
+├── configs/                           # Configuration templates
 ├── docs/                              # Documentation
 │   ├── architecture.md                # Network topology & design
 │   ├── setup-guides/                  # Step-by-step walkthroughs
 │   └── runbooks/                      # Operational procedures
-│
-├── infrastructure/
-│   ├── vagrant/
-│   │   └── Vagrantfile                # Multi-VM configuration
-│   └── scripts/
-│       ├── phase1-infrastructure/     # DC & Client setup
-│       │   ├── 01-dc-setup.ps1
-│       │   └── 02-client-setup.ps1
-│       ├── phase2-identity/           # AD users, OUs, delegation
-│       │   ├── 01-create-ou-users.ps1
-│       │   └── 02-helpdesk-delegation.ps1
-│       └── phase3-hardening/          # GPOs & audit policies
-│           └── 01-security-gpos.ps1
-│
-├── configs/                           # Configuration templates
-└── vms/                               # VM storage (gitignored)
+├── scripts/
+│   ├── phase1-infrastructure/         # DC & Client setup
+│   │   ├── 01-dc-setup.ps1
+│   │   └── 02-client-setup.ps1
+│   ├── phase2-identity/               # AD users, OUs, delegation
+│   │   ├── 01-create-ou-users.ps1
+│   │   └── 02-helpdesk-delegation.ps1
+│   └── phase3-hardening/              # GPOs & audit policies
+│       └── 01-security-gpos.ps1
+├── tests/                             # Pester tests & validation scripts
+├── vms/                               # VM storage (gitignored)
+└── Vagrantfile                        # Multi-VM configuration
 ```
 
 ---
