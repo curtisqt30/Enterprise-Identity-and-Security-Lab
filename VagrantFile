@@ -4,7 +4,10 @@
 Vagrant.configure("2") do |config|
 
   # Global Timeout for Windows (it takes a while to boot)
-  config.vm.boot_timeout = 600
+  config.vm.boot_timeout = 1200
+
+  # Disable default synced folder (causes issues with Hyper-V)
+  config.vm.synced_folder ".", "/vagrant", disabled: true
 
   # ============================================
   # Windows Server 2022 - Domain Controller
@@ -12,18 +15,29 @@ Vagrant.configure("2") do |config|
   config.vm.define "dc01" do |dc|
     dc.vm.box = "gusztavvargadr/windows-server-2022-standard"
     dc.vm.hostname = "DC01"
-    
-    # Internal network for AD communication
-    dc.vm.network "private_network", ip: "192.168.56.10", virtualbox__intnet: "LabNet"
 
+    # VirtualBox provider
     dc.vm.provider "virtualbox" do |vb|
       vb.name = "DC01-Server2022"
       vb.memory = "4096"
       vb.cpus = 2
       vb.gui = true
-      # Optimization for Windows performance in VirtualBox
       vb.customize ["modifyvm", :id, "--vram", "128"]
       vb.customize ["modifyvm", :id, "--clipboard-mode", "bidirectional"]
+    end
+
+    # Hyper-V provider
+    dc.vm.provider "hyperv" do |hv|
+      hv.vmname = "DC01-Server2022"
+      hv.memory = "4096"
+      hv.cpus = 2
+      hv.enable_virtualization_extensions = true
+      hv.linked_clone = true
+    end
+
+    # Network config per provider
+    dc.vm.provider "virtualbox" do |vb, override|
+      override.vm.network "private_network", ip: "192.168.56.10", virtualbox__intnet: "LabNet"
     end
 
     dc.vm.provision "shell", path: "scripts/phase1-infrastructure/01-dc-setup.ps1"
@@ -36,15 +50,26 @@ Vagrant.configure("2") do |config|
     client.vm.box = "gusztavvargadr/windows-10"
     client.vm.hostname = "CLIENT01"
 
-    # Static IP assigned for initial connectivity testing
-    client.vm.network "private_network", ip: "192.168.56.100", virtualbox__intnet: "LabNet"
-
+    # VirtualBox provider
     client.vm.provider "virtualbox" do |vb|
       vb.name = "CLIENT01-Win10"
       vb.memory = "2048"
       vb.cpus = 2
       vb.gui = true
       vb.customize ["modifyvm", :id, "--vram", "128"]
+    end
+
+    # Hyper-V provider
+    client.vm.provider "hyperv" do |hv|
+      hv.vmname = "CLIENT01-Win10"
+      hv.memory = "2048"
+      hv.cpus = 2
+      hv.linked_clone = true
+    end
+
+    # Network config per provider
+    client.vm.provider "virtualbox" do |vb, override|
+      override.vm.network "private_network", ip: "192.168.56.100", virtualbox__intnet: "LabNet"
     end
 
     client.vm.provision "shell", path: "scripts/phase1-infrastructure/02-client-setup.ps1"
