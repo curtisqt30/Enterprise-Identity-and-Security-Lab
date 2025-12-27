@@ -14,7 +14,7 @@
 
 ---
 
-## Phase 1: Infrastructure ✅
+## Phase 1: Infrastructure
 
 - [x] Created multi-provider Vagrantfile (Hyper-V + VirtualBox support)
 - [x] Provisioned Windows Server 2022 VM (DC01)
@@ -31,7 +31,7 @@ vagrant up client01 --provider=hyperv
 
 ---
 
-## Phase 2: Identity & Automation ✅
+## Phase 2: Identity & Automation
 
 - [x] Created Organizational Unit (OU) structure:
   ```
@@ -69,7 +69,7 @@ vagrant up client01 --provider=hyperv
 
 ---
 
-## Phase 3: Hardening & Monitoring ✅
+## Phase 3: Hardening & Monitoring
 
 - [x] Created and linked Group Policy Objects:
 
