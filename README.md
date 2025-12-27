@@ -2,7 +2,7 @@
 
 ## Environment Setup
 
-- **Hypervisor:** Hyper-V (VirtualBox incompatible with Windows security features on modern hardware)
+- **Hypervisor:** Hyper-V
 - **IaC Tool:** Vagrant with multi-provider Vagrantfile
 - **Domain:** lab.local
 - **Network:** Default Switch (Hyper-V NAT)
