@@ -74,4 +74,35 @@ Vagrant.configure("2") do |config|
 
     client.vm.provision "shell", path: "scripts/phase1-infrastructure/02-client-setup.ps1"
   end
+
+  # ============================================
+  # Ubuntu Server - Wazuh SIEM
+  # ============================================
+  config.vm.define "wazuh01" do |wazuh|
+    wazuh.vm.box = "bento/ubuntu-22.04"
+    wazuh.vm.hostname = "wazuh01"
+
+    # VirtualBox provider
+    wazuh.vm.provider "virtualbox" do |vb|
+      vb.name = "WAZUH01-Ubuntu"
+      vb.memory = "4096"
+      vb.cpus = 2
+      vb.gui = false
+    end
+
+    # Hyper-V provider
+    wazuh.vm.provider "hyperv" do |hv|
+      hv.vmname = "WAZUH01-Ubuntu"
+      hv.memory = "4096"
+      hv.cpus = 2
+      hv.linked_clone = true
+    end
+
+    # Network config per provider
+    wazuh.vm.provider "virtualbox" do |vb, override|
+      override.vm.network "private_network", ip: "192.168.56.20", virtualbox__intnet: "LabNet"
+    end
+
+    wazuh.vm.provision "shell", path: "scripts/phase4-siem/01-wazuh-server-setup.sh"
+  end
 end
