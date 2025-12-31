@@ -1,145 +1,125 @@
-# Lab Completion Summary
+# Enterprise Identity & Security Lab
 
-## Environment Setup
+A fully automated Windows Active Directory lab environment demonstrating enterprise identity management, security hardening, and SIEM monitoring using a DevSecOps approach.
 
-- **Hypervisor:** Hyper-V
-- **IaC Tool:** Vagrant with multi-provider Vagrantfile
-- **Domain:** lab.local
-- **Network:** Default Switch (Hyper-V NAT)
+## Purpose
 
-| VM | Hostname | IP | Role |
-|----|----------|-----|------|
-| DC01-Server2022 | DC01 | 172.28.209.217 | Domain Controller |
-| CLIENT01-Win10 | CLIENT01 | 172.28.217.20 | Domain Workstation |
+This project showcases the ability to architect, deploy, and secure a corporate Windows domain environment — the foundational infrastructure found in most enterprise organizations. It demonstrates practical skills in:
 
----
+- Infrastructure as Code (IaC) for repeatable deployments
+- Windows Server administration and Active Directory
+- Identity management with least privilege principles
+- Security hardening through Group Policy
+- Centralized security monitoring with SIEM
 
-## Phase 1: Infrastructure
+## Architecture
 
-- [x] Created multi-provider Vagrantfile (Hyper-V + VirtualBox support)
-- [x] Provisioned Windows Server 2022 VM (DC01)
-- [x] Installed AD DS role and promoted to Domain Controller
-- [x] Configured DNS on DC01
-- [x] Provisioned Windows 10 VM (CLIENT01)
-- [x] Joined CLIENT01 to lab.local domain
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Hyper-V Host                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   ┌─────────────┐    ┌─────────────┐    ┌─────────────┐        │
+│   │    DC01     │    │  CLIENT01   │    │   WAZUH01   │        │
+│   │ Win Server  │    │   Win 10    │    │   Ubuntu    │        │
+│   │ 2022        │    │             │    │   22.04     │        │
+│   │             │    │             │    │             │        │
+│   │ • AD DS     │    │ • Domain    │    │ • Wazuh     │        │
+│   │ • DNS       │◄───│   Joined    │───►│   Manager   │        │
+│   │ • GPO       │    │ • RSAT      │    │ • Dashboard │        │
+│   │ • Audit     │    │ • Agent     │    │ • Indexer   │        │
+│   └─────────────┘    └─────────────┘    └─────────────┘        │
+│         │                   │                  ▲                │
+│         │                   │                  │                │
+│         └───────────────────┴──────────────────┘                │
+│                     Security Events                             │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-**Key Commands:**
+## Tool Stack
+
+| Category | Technology |
+|----------|------------|
+| Hypervisor | Hyper-V |
+| IaC | Vagrant |
+| Domain Services | Windows Server 2022, Active Directory |
+| Workstation | Windows 10 Enterprise |
+| SIEM | Wazuh 4.9 |
+| Scripting | PowerShell, Bash |
+| Version Control | Git |
+
+## Key Features
+
+### Identity Management
+- Organizational Unit hierarchy mirroring enterprise structure
+- Role-based security groups (IT-Admins, Help-Desk, HR-Staff, Finance-Staff)
+- Delegated administration with least privilege (Help Desk password reset only)
+
+### Security Hardening (GPO)
+- Password complexity and account lockout policies
+- USB storage device restrictions
+- Automated screen lock timeout
+- Advanced audit logging for security events
+
+### SIEM Integration
+- Centralized log collection from all Windows endpoints
+- Real-time security event monitoring
+- Wazuh agents deployed to DC and workstation
+
+## Project Structure
+
+```
+├── configs/                    # Configuration templates
+├── docs/                       # Documentation
+│   ├── script-reference.md     # Script documentation
+│   └── setup-guides/           # Detailed setup guides
+├── scripts/
+│   ├── phase1-infrastructure/  # DC promotion, domain join
+│   ├── phase2-identity/        # OUs, users, delegation
+│   ├── phase3-hardening/       # GPO deployment
+│   └── phase4-siem/            # Wazuh server and agents
+├── tests/                      # Validation scripts
+├── vms/                        # VM storage (gitignored)
+└── Vagrantfile                 # Multi-provider VM definitions
+```
+
+## Quick Start
+
 ```powershell
+# Clone and deploy
+git clone https://github.com/yourusername/Enterprise-Identity-and-Security-Lab.git
+cd Enterprise-Identity-and-Security-Lab
+
+# Start infrastructure (Hyper-V)
 vagrant up dc01 --provider=hyperv
 vagrant up client01 --provider=hyperv
+vagrant up wazuh01 --provider=hyperv
 ```
 
----
+See [docs/setup-guides/](docs/setup-guides/) for detailed instructions.
 
-## Phase 2: Identity & Automation
+## Skills Demonstrated
 
-- [x] Created Organizational Unit (OU) structure:
-  ```
-  lab.local
-  ├── LAB Users
-  │   ├── IT
-  │   │   └── Help Desk
-  │   ├── HR
-  │   └── Finance
-  ├── LAB Computers
-  │   ├── Workstations
-  │   └── Servers
-  └── LAB Groups
-  ```
-
-- [x] Created Security Groups:
-  - IT-Admins
-  - Help-Desk
-  - HR-Staff
-  - Finance-Staff
-
-- [x] Created sample users:
-  | Username | OU | Group |
-  |----------|-----|-------|
-  | a.admin | IT | IT-Admins |
-  | b.helpdesk | Help Desk | Help-Desk |
-  | c.hr | HR | HR-Staff |
-  | d.finance | Finance | Finance-Staff |
-
-- [x] Configured Help Desk Delegation (password reset rights on LAB Users OU)
-
-**Verification:**
-- Active Directory Users and Computers (`dsa.msc`)
-- View → Advanced Features → Security tab for delegation
-
----
-
-## Phase 3: Hardening & Monitoring
-
-- [x] Created and linked Group Policy Objects:
-
-  | GPO | Linked To | Purpose |
-  |-----|-----------|---------|
-  | SEC - Password and Lockout Policy | Domain Root | Enforce strong passwords |
-  | SEC - Disable USB Storage | LAB Computers OU | Block removable drives |
-  | SEC - Screen Lock Timeout | LAB Computers OU | 15 min idle lock |
-  | SEC - Advanced Audit Logging | Domain Root | Security event logging |
-
-- [x] Applied policies to CLIENT01 via `gpupdate /force`
-
-**Verification:**
-- Group Policy Management Console (`gpmc.msc`)
-- `Get-GPO -All | Select-Object DisplayName`
-
----
-
-## Post-Setup Configuration
-
-- [x] Installed RSAT on CLIENT01 for remote AD management:
-  ```powershell
-  Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
-  ```
-
-- [x] Added Domain Users to Remote Desktop Users on CLIENT01:
-  ```powershell
-  Add-LocalGroupMember -Group "Remote Desktop Users" -Member "LAB\Domain Users"
-  ```
-
----
-
-## Validation Tests Completed
-
-- [x] Logged in as domain user (d.finance) on CLIENT01
-- [x] Tested Help Desk delegation: b.helpdesk successfully reset d.finance password
-- [x] Verified OU structure in AD Users and Computers
-- [x] Verified GPOs in Group Policy Management Console
-
----
-
-## Useful Commands
-
-```powershell
-# Vagrant management
-vagrant up                    # Start VMs
-vagrant suspend               # Pause VMs (saves state)
-vagrant halt                  # Shutdown VMs
-vagrant status                # Check VM state
-
-# AD verification (run on DC01)
-Get-ADDomain                  # Verify domain info
-Get-ADOrganizationalUnit -Filter * | Select Name    # List OUs
-Get-ADUser -Filter * | Select Name, SamAccountName  # List users
-Get-ADGroup -Filter * | Select Name                 # List groups
-Get-GPO -All | Select DisplayName                   # List GPOs
-
-# Client management
-gpupdate /force               # Refresh group policies
-(Get-WmiObject Win32_ComputerSystem).Domain         # Check domain membership
-```
-
----
+- **Systems Administration:** Windows Server, Active Directory, DNS, Group Policy
+- **Security:** Least privilege access, audit logging, SIEM deployment, hardening
+- **Automation:** Infrastructure as Code, PowerShell scripting, Vagrant
+- **Networking:** Domain services, internal networks, agent communication
+- **DevSecOps:** Version-controlled infrastructure, repeatable deployments
 
 ## Lessons Learned
 
-1. **Hyper-V vs VirtualBox:** Modern Windows security features (VBS, Credential Guard) conflict with VirtualBox. Hyper-V is the better choice for Windows-on-Windows virtualization and mirrors enterprise environments.
+1. **Hyper-V over VirtualBox** — Modern Windows security features (VBS, Credential Guard) conflict with VirtualBox. Hyper-V provides better stability for Windows guests.
 
-2. **Multi-provider Vagrantfile:** Supports both Hyper-V and VirtualBox, allowing flexibility across different machines.
+2. **Least Privilege in Practice** — Delegating specific AD permissions (password reset) to Help Desk demonstrates real-world access control without granting full admin rights.
 
-3. **Remote Administration:** In enterprise environments, you don't log into Domain Controllers directly. Install RSAT on workstations and manage AD remotely.
+3. **Remote Administration** — Enterprise best practice is managing AD remotely via RSAT, not logging directly into Domain Controllers.
 
-4. **Principle of Least Privilege:** Help Desk delegation demonstrates granting only necessary permissions (password reset) without full admin access.
+4. **SIEM Visibility** — Centralized logging transforms scattered Windows events into actionable security intelligence.
+
+## Future Enhancements
+
+- [ ] Sysmon deployment for enhanced endpoint telemetry
+- [ ] Fine-grained password policies
+- [ ] Certificate Services (AD CS)
+- [ ] Azure AD Connect hybrid identity
+- [ ] Automated attack simulation for detection testing

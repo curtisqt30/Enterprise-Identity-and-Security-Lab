@@ -1,41 +1,62 @@
-#!/bin/bash
-# Phase 4: Wazuh SIEM Server Setup
-# Run on Ubuntu Server VM
+#Requires -RunAsAdministrator
+<#
+.SYNOPSIS
+    Deploys Wazuh agent to Windows machines.
+.DESCRIPTION
+    Phase 4: Installs and configures Wazuh agent to connect to Wazuh manager.
+.PARAMETER WazuhServerIP
+    IP address of the Wazuh manager server.
+.NOTES
+    Run on DC01 and CLIENT01 after Wazuh server is running.
+.EXAMPLE
+    .\02-deploy-windows-agent.ps1 -WazuhServerIP "172.28.x.x"
+#>
 
-set -e
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$WazuhServerIP
+)
 
-echo "=== Phase 4: Wazuh SIEM Server Setup ==="
+$WazuhVersion = "4.9.0-1"
+$AgentName = $env:COMPUTERNAME
 
-# Update system
-echo "[1/4] Updating system packages..."
-apt-get update && apt-get upgrade -y
+Write-Host "=== Phase 4: Wazuh Agent Deployment ===" -ForegroundColor Cyan
 
-# Install prerequisites
-echo "[2/4] Installing prerequisites..."
-apt-get install -y curl apt-transport-https lsb-release gnupg
+# Download Wazuh agent
+Write-Host "[1/4] Downloading Wazuh agent..." -ForegroundColor Yellow
+$InstallerUrl = "https://packages.wazuh.com/4.x/windows/wazuh-agent-$WazuhVersion.msi"
+$InstallerPath = "$env:TEMP\wazuh-agent.msi"
+Invoke-WebRequest -Uri $InstallerUrl -OutFile $InstallerPath
 
-# Download and run Wazuh installer
-echo "[3/4] Installing Wazuh (all-in-one)..."
-curl -sO https://packages.wazuh.com/4.9/wazuh-install.sh
-chmod +x wazuh-install.sh
-./wazuh-install.sh -a -i
+# Install agent
+Write-Host "[2/4] Installing Wazuh agent..." -ForegroundColor Yellow
+$InstallArgs = @(
+    "/i", $InstallerPath,
+    "/q",
+    "WAZUH_MANAGER=$WazuhServerIP",
+    "WAZUH_AGENT_NAME=$AgentName",
+    "WAZUH_REGISTRATION_SERVER=$WazuhServerIP"
+)
+Start-Process msiexec.exe -ArgumentList $InstallArgs -Wait
 
-# Extract credentials
-echo "[4/4] Extracting dashboard credentials..."
-tar -xvf wazuh-install-files.tar
-cat wazuh-install-files/wazuh-passwords.txt > /home/vagrant/wazuh-credentials.txt
-chown vagrant:vagrant /home/vagrant/wazuh-credentials.txt
+# Start agent service
+Write-Host "[3/4] Starting Wazuh agent service..." -ForegroundColor Yellow
+Start-Service -Name "WazuhSvc"
 
-# Get IP address for reference
-IP_ADDR=$(hostname -I | awk '{print $1}')
+# Verify installation
+Write-Host "[4/4] Verifying installation..." -ForegroundColor Yellow
+$Service = Get-Service -Name "WazuhSvc" -ErrorAction SilentlyContinue
+if ($Service.Status -eq "Running") {
+    Write-Host "Wazuh agent installed and running!" -ForegroundColor Green
+} else {
+    Write-Host "Warning: Agent service not running. Check logs at C:\Program Files (x86)\ossec-agent\logs\" -ForegroundColor Red
+}
 
-echo ""
-echo "=== Wazuh Installation Complete ==="
-echo ""
-echo "Dashboard URL: https://$IP_ADDR"
-echo "Credentials saved to: /home/vagrant/wazuh-credentials.txt"
-echo ""
-echo "Next steps:"
-echo "1. Access dashboard from browser"
-echo "2. Deploy agents to DC01 and CLIENT01"
-echo ""
+Write-Host ""
+Write-Host "=== Agent Deployment Complete ===" -ForegroundColor Green
+Write-Host ""
+Write-Host "Agent Name: $AgentName"
+Write-Host "Manager: $WazuhServerIP"
+Write-Host "Config: C:\Program Files (x86)\ossec-agent\ossec.conf"
+Write-Host "Logs: C:\Program Files (x86)\ossec-agent\logs\"
+Write-Host ""

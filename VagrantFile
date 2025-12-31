@@ -79,7 +79,7 @@ Vagrant.configure("2") do |config|
   # Ubuntu Server - Wazuh SIEM
   # ============================================
   config.vm.define "wazuh01" do |wazuh|
-    wazuh.vm.box = "bento/ubuntu-22.04"
+    wazuh.vm.box = "generic/ubuntu2204"
     wazuh.vm.hostname = "wazuh01"
 
     # VirtualBox provider
@@ -94,6 +94,7 @@ Vagrant.configure("2") do |config|
     wazuh.vm.provider "hyperv" do |hv|
       hv.vmname = "WAZUH01-Ubuntu"
       hv.memory = "4096"
+      hv.maxmemory = "4096"
       hv.cpus = 2
       hv.linked_clone = true
     end
