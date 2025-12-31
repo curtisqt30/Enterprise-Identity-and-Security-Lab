@@ -83,21 +83,6 @@ This project showcases the ability to architect, deploy, and secure a corporate 
 └── Vagrantfile                 # Multi-provider VM definitions
 ```
 
-## Quick Start
-
-```powershell
-# Clone and deploy
-git clone https://github.com/yourusername/Enterprise-Identity-and-Security-Lab.git
-cd Enterprise-Identity-and-Security-Lab
-
-# Start infrastructure (Hyper-V)
-vagrant up dc01 --provider=hyperv
-vagrant up client01 --provider=hyperv
-vagrant up wazuh01 --provider=hyperv
-```
-
-See [docs/setup-guides/](docs/setup-guides/) for detailed instructions.
-
 ## Skills Demonstrated
 
 - **Systems Administration:** Windows Server, Active Directory, DNS, Group Policy
