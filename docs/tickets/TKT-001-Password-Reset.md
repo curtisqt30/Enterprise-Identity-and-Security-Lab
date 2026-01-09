@@ -8,6 +8,9 @@
 | **Priority** | Medium |
 | **Technician** | Curtis |
 
+## Issue Description
+User reported they are unable to log in to their workstation. They believe they have forgotten their password after returning from the weekend.
+
 ## Troubleshooting Steps Taken
 1.  **Verified User Identity:** Confirmed request came from the valid user.
 2.  **Checked Account Status:** Used Active Directory Users & Computers (ADUC) to check user object `d.finance`.
