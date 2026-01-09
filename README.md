@@ -12,6 +12,24 @@ This project showcases the ability to architect, deploy, and secure a corporate 
 - Security hardening through Group Policy
 - Centralized security monitoring with SIEM
 
+## Operational Portfolio (Live Scenarios)
+
+Beyond deployment, this lab serves as a live environment for simulating Help Desk and Security Operations.
+
+### 1. Help Desk Operations (Ticket & SOP)
+- **Scenario:** Simulated a "User Locked Out" incident for a Finance employee.
+- **Resolution:** Performed remote resolution via RSAT on a secure management workstation (`CLIENT01`) rather than accessing the Domain Controller directly.
+- **Documentation:**
+  - [TKT-001: Password Reset Ticket](./docs/tickets/TKT-001-Finance-Password-Reset.md) (Incident Lifecycle)
+  - [SOP-001: Standard Password Reset Procedure](./docs/sops/SOP-001-Password-Reset.md) (Standard Operating Procedure)
+
+### 2. Security Audit & Remediation
+- **Finding:** During a privilege audit, discovered a Critical Misconfiguration allowing Help Desk users to reset Domain Admin passwords (vertical privilege escalation).
+- **Remediation:** Re-architected OU structure to segregate Tier-0 (Admin) accounts into a protected container, breaking the inheritance model.
+- **Validation:** Verified "Access Denied" on Admin objects using Active Directory "Effective Access" auditing.
+- **Documentation:**
+  - [SEC-001: Privilege Escalation Remediation Report](./docs/reports/SEC-001-Privilege-Escalation-Fix.md)
+
 ## Architecture
 
 ```
@@ -88,6 +106,7 @@ This project showcases the ability to architect, deploy, and secure a corporate 
 - **Systems Administration:** Windows Server, Active Directory, DNS, Group Policy
 - **Security:** Least privilege access, audit logging, SIEM deployment, hardening
 - **Automation:** Infrastructure as Code, PowerShell scripting, Vagrant
+- **Operations:** Ticket management, SOP creation, and remote administration (RSAT)
 - **Networking:** Domain services, internal networks, agent communication
 - **DevSecOps:** Version-controlled infrastructure, repeatable deployments
 
