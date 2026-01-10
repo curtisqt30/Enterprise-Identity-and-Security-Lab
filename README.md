@@ -30,6 +30,16 @@ Beyond deployment, this lab serves as a live environment for simulating Help Des
 - **Documentation:**
   - [SEC-001: Privilege Escalation Remediation Report](./docs/reports/SEC-001-Privilege-Escalation-Fix.md)
 
+### 3. Account Lockout Hardening & SIEM RBAC
+- **Scenario:** A routine lockout incident (Carol HR) revealed a disabled domain lockout policy and a lack of Help Desk visibility in the SIEM.
+- **Remediation:** Hardended the domain's **Account Lockout Policy** via GPO (5-attempt threshold).
+  - Implemented **Least Privilege** by delegating `lockoutTime` and `pwdLastSet` attributes to the Help Desk group
+  - Developed a **Read-Only RBAC model** in Wazuh, resolving "Pattern Handler" errors to grant the Help Desk secure visibility into security logs.
+- **Documentation:**
+  - [SEC-002: Account Lockout Report](./docs/reports/SEC-002-Account-Lockout-Hardening.md)
+  - [SOP-002: Standard Account Lockout Resolution](./docs/reports/SOP-002-Standard-Account-Lockout-Resolution.md)
+
+
 ## Architecture
 
 ```
@@ -109,6 +119,8 @@ Beyond deployment, this lab serves as a live environment for simulating Help Des
 - **Operations:** Ticket management, SOP creation, and remote administration (RSAT)
 - **Networking:** Domain services, internal networks, agent communication
 - **DevSecOps:** Version-controlled infrastructure, repeatable deployments
+- **SIEM Role-Based Access Control (RBAC):** Designing custom indexer roles and tenant mappings to provide secure, restricted visibility.
+- **Granular AD Attribute Delegation:** Mastering the "Delegation of Control" wizard to grant specific rights (pwdLastSet) beyond simple password resets.
 
 ## Lessons Learned
 
@@ -119,6 +131,8 @@ Beyond deployment, this lab serves as a live environment for simulating Help Des
 3. **Remote Administration** — Enterprise best practice is managing AD remotely via RSAT, not logging directly into Domain Controllers.
 
 4. **SIEM Visibility** — Centralized logging transforms scattered Windows events into actionable security intelligence.
+
+5. **Governance & Privilege Creep** — Learned that as a system evolves, permissions must be managed at the group level and documented thoroughly to prevent "creeping" administrative rights over time.
 
 ## Future Enhancements
 
