@@ -6,7 +6,7 @@
 | **Severity** | **Critical** (Potential Domain Compromise) |
 | **Date Detected** | 2026-01-08 |
 | **Remediation Date** | 2026-01-08 |
-| **Author** | Curtis |
+| **Author** | Alice Admin |
 
 ## Executive Summary
 During a routine permission audit of the Active Directory environment, a critical misconfiguration was identified. Support staff members (Help Desk) possessed effective permissions to reset the passwords of Domain Administrator accounts. This created a vertical privilege escalation path, allowing a compromised Help Desk account to seize control of the domain.
