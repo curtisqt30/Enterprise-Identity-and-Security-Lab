@@ -33,6 +33,7 @@ lab.local
 │   ├── IT
 │   │   └── Help Desk
 │   ├── HR
+│   ├── Sales
 │   └── Finance
 ├── LAB Computers
 │   ├── Workstations
@@ -40,15 +41,14 @@ lab.local
 └── LAB Groups
 ```
 
-**Sample Users:**
-| Username | OU | Group Membership |
-|----------|-----|------------------|
+**Sample Users & Governance Logic:**
+| Username | Department Attribute | Automated Group Membership |
+|----------|-------------------|------------------|
 | a.admin | IT | IT-Admins |
-| b.helpdesk | Help Desk | Help-Desk |
+| b.helpdesk | IT | Help-Desk |
 | c.hr | HR | HR-Staff |
 | d.finance | Finance | Finance-Staff |
-
-Default password: `Welcome123!` (forced change at first logon)
+| e.sales | Sales | Sales-Staff |
 
 ---
 
@@ -68,8 +68,25 @@ Scripts that implement CySA+ aligned security controls via Group Policy.
 | SEC - Disable USB Storage | LAB Computers OU | Blocks removable storage devices |
 | SEC - Screen Lock Timeout | LAB Computers OU | Forces screen lock after 15 min inactivity, requires password on resume |
 | SEC - Advanced Audit Logging | Domain Root | Enables detailed security event logging for SOC analysis |
+| SEC - Drive Maps | LAB Users OU | Auto-mounts the `G:` drive to `\\DC01\CorpData` for all users |
 
-**Note:** Password policies require manual configuration in GPMC (Default Domain Policy) or via Fine-Grained Password Policies.
+---
+
+## Phase 4: Data Security (Access Control)
+
+Scripts that implement File Server Resource Management, ACLs, and dummy data for testing.
+
+| Script | Purpose |
+|--------|---------|
+| `01-secure-file-shares.ps1` | Creates `C:\CorpData` directory structure, configures SMB shares with **Access-Based Enumeration (ABE)**, and enforces strict NTFS permissions (Finance users cannot see HR folders). |
+| `02-generate-dummy-data.ps1` | Populates departmental folders with realistic "dummy" files (e.g., `Exec_Salaries.xlsx`, `Termination_Letter.docx`) to validate access controls and DLP monitoring. |
+
+**Access Control Matrix:**
+| Folder | HR-Staff | Finance-Staff | Sales-Staff | Help-Desk |
+|:-------|:--------:|:-------------:|:-----------:|:---------:|
+| `\HR` | **Modify** | ⛔ Deny | ⛔ Deny | ⛔ Deny |
+| `\Finance` | ⛔ Deny | **Modify** | ⛔ Deny | ⛔ Deny |
+| `\Sales` | ⛔ Deny | ⛔ Deny | **Modify** | ⛔ Deny |
 
 ---
 
@@ -80,12 +97,15 @@ Scripts that implement CySA+ aligned security controls via Group Policy.
 vagrant up dc01      # Wait for reboot
 vagrant up client01  # Joins domain automatically
 
-# Phase 2 - Run manually on DC01 after domain is ready
+# Phase 2 - Run manually on DC01
 .\scripts\phase2-identity\01-create-ou-users.ps1
 .\scripts\phase2-identity\02-helpdesk-delegation.ps1
+.\scripts\phase2-identity\03-auto-group-sync.ps1  # Run periodically to enforce membership
 
 # Phase 3 - Run manually on DC01
 .\scripts\phase3-hardening\01-security-gpos.ps1
 gpupdate /force      # Apply to DC
-# Run gpupdate /force on CLIENT01 as well
-```
+
+# Phase 4 - Data & ACLs
+.\scripts\phase4-data\01-secure-file-shares.ps1
+.\scripts\phase4-data\02-generate-dummy-data.ps1
