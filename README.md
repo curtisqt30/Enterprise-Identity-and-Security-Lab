@@ -32,13 +32,19 @@ Beyond deployment, this lab serves as a live environment for simulating Help Des
 
 ### 3. Account Lockout Hardening & SIEM RBAC
 - **Scenario:** A routine lockout incident (Carol HR) revealed a disabled domain lockout policy and a lack of Help Desk visibility in the SIEM.
-- **Remediation:** Hardended the domain's **Account Lockout Policy** via GPO (5-attempt threshold).
+- **Remediation:** Hardened the domain's **Account Lockout Policy** via GPO (5-attempt threshold).
   - Implemented **Least Privilege** by delegating `lockoutTime` and `pwdLastSet` attributes to the Help Desk group
   - Developed a **Read-Only RBAC model** in Wazuh, resolving "Pattern Handler" errors to grant the Help Desk secure visibility into security logs.
 - **Documentation:**
   - [SEC-002: Account Lockout Report](./docs/reports/SEC-002-Account-Lockout-Hardening.md)
   - [SOP-002: Standard Account Lockout Resolution](./docs/reports/SOP-002-Standard-Account-Lockout-Resolution.md)
 
+### 4. Departmental Data Isolation (RBAC & ABE)
+- **Scenario:** Required strict confidentiality between HR, Finance, and the new Sales department.
+- **Resolution:** Deployed **Access-Based Enumeration (ABE)** on file shares so users only see folders they have permission to access.
+- **Validation:** - Validated that `HR-Staff` cannot view `Finance` folders.
+  - Confirmed `Help-Desk` has no read access to sensitive departmental files (Zero Trust).
+- **Automation:** Implemented an **Identity Governance script** to automatically add/remove users from groups based on their "Department" attribute.
 
 ## Architecture
 
@@ -80,8 +86,9 @@ Beyond deployment, this lab serves as a live environment for simulating Help Des
 
 ### Identity Management
 - Organizational Unit hierarchy mirroring enterprise structure
-- Role-based security groups (IT-Admins, Help-Desk, HR-Staff, Finance-Staff)
+- Role-based security groups (IT-Admins, Help-Desk, HR-Staff, Finance-Staff, Sales-Staff)
 - Delegated administration with least privilege (Help Desk password reset only)
+- **Identity Governance:** Automated group membership reconciliation based on user attributes.
 
 ### Security Hardening (GPO)
 - Password complexity and account lockout policies
