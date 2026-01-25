@@ -106,4 +106,47 @@ Vagrant.configure("2") do |config|
 
     wazuh.vm.provision "shell", path: "scripts/phase4-siem/01-wazuh-server-setup.sh"
   end
+
+  # ============================================
+  # EVE-NG Community (Ubuntu 20.04 Base)
+  # ============================================
+  config.vm.define "eveng" do |eve|
+    # EVE-NG is built on Ubuntu 20.04 LTS (Focal Fossa)
+    eve.vm.box = "generic/ubuntu2004"
+    eve.vm.hostname = "eve-ng"
+
+    # VirtualBox provider
+    eve.vm.provider "virtualbox" do |vb|
+      vb.name = "EVE-NG-Community"
+      vb.memory = "8192" # Needs 8GB+ for labbing
+      vb.cpus = 4        # Needs 4+ vCPUs
+      vb.gui = true      # GUI needed to see IP on console if network breaks
+      # Enable Nested Virtualization (Crucial for running VMs inside VMs)
+      vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
+      # Enable Promiscuous mode for bridging
+      vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+    end
+
+    # Hyper-V provider (Recommended)
+    eve.vm.provider "hyperv" do |hv|
+      hv.vmname = "EVE-NG-Community"
+      hv.memory = "8192"
+      hv.maxmemory = "16384" # Allow dynamic expansion
+      hv.cpus = 4
+      # Enable Nested Virtualization
+      hv.enable_virtualization_extensions = true 
+      hv.linked_clone = true
+      # Mac Address Spoofing is often required for nested networking in Hyper-V
+      # You may need to enable this manually in Hyper-V settings if bridges fail
+    end
+
+    # Network config
+    # EVE-NG needs a dedicated IP to act as the web server
+    eve.vm.provider "virtualbox" do |vb, override|
+      override.vm.network "private_network", ip: "192.168.56.50", virtualbox__intnet: "LabNet"
+    end
+    
+    # Note: For Hyper-V, Vagrant usually relies on the default switch or an external switch.
+    # Ensure this VM is attached to the same switch as DC01 manually if they can't ping.
+  end
 end
