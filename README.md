@@ -78,6 +78,14 @@ Beyond deployment, this lab serves as a live environment for simulating Help Des
 │                     └───────────────┘                           │
 └─────────────────────────────────────────────────────────────────┘
 ```
+### Network Infrastructure
+To move beyond a flat network topology, EVE-NG Community Edition has been deployed as a nested hypervisor appliance. This allows for the emulation of enterprise-grade switching and routing hardware alongside the Windows environment.
+- **Host:** EVE-NG Community (Ubuntu 20.04 base)
+- **Management IP:** `172.26.11.15`
+- **Role:**
+  - Hosting Cisco IOS/IOL images for switching logic.
+  - Enforcing VLAN segmentation between HR, Finance, and IT resources.
+  - Acting as the network backbone for the Windows AD environment. 
 
 ## Tool Stack
 
