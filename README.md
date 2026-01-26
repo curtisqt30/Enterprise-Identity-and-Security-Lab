@@ -65,8 +65,17 @@ Beyond deployment, this lab serves as a live environment for simulating Help Des
 │   └─────────────┘    └─────────────┘    └─────────────┘        │
 │         │                   │                  ▲                │
 │         │                   │                  │                │
-│         └───────────────────┴──────────────────┘                │
-│                     Security Events                             │
+│         └───────────────────┼──────────────────┘                │
+│                             │                                   │
+│                     ┌───────▼───────┐                           │
+│                     │    EVE-NG     │                           │
+│                     │  Net Emul.    │                           │
+│                     │ 172.26.11.15  │                           │
+│                     │               │                           │
+│                     │ • Cisco IOS   │                           │
+│                     │ • VLANs/ACLs  │                           │
+│                     │ • Switching   │                           │
+│                     └───────────────┘                           │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -79,6 +88,7 @@ Beyond deployment, this lab serves as a live environment for simulating Help Des
 | Domain Services | Windows Server 2022, Active Directory |
 | Workstation | Windows 10 Enterprise |
 | SIEM | Wazuh 4.9 |
+| Network Emulation | EVE-NG Community (Bare Metal Kernel 5.17.8) |
 | Scripting | PowerShell, Bash |
 | Version Control | Git |
 
@@ -112,7 +122,9 @@ Beyond deployment, this lab serves as a live environment for simulating Help Des
 │   ├── phase1-infrastructure/  # DC promotion, domain join
 │   ├── phase2-identity/        # OUs, users, delegation
 │   ├── phase3-hardening/       # GPO deployment
-│   └── phase4-siem/            # Wazuh server and agents
+│   ├── phase4-siem/            # Wazuh server and agents
+│   └── phase5-network/         # EVE-NG topology and device configs
+
 ├── tests/                      # Validation scripts
 ├── vms/                        # VM storage (gitignored)
 └── Vagrantfile                 # Multi-provider VM definitions
@@ -148,3 +160,7 @@ Beyond deployment, this lab serves as a live environment for simulating Help Des
 - [ ] Certificate Services (AD CS)
 - [ ] Azure AD Connect hybrid identity
 - [ ] Automated attack simulation for detection testing
+- [ ] Network Segmentation: Import Windows VMs into EVE-NG to simulate realistic VLAN segmentation (User, Server, DMZ).- [ ] Firewall Enforcement: Deploy a virtual firewall (pfsense/FortiGate) inside EVE-NG to inspect traffic between DC01 and endpoints.
+- [ ] Sysmon deployment: Enhanced endpoint telemetry.
+- [ ] Fine-grained password policies: FGPP implementation.
+- [ ] Certificate Services: Deploy AD CS for internal PKI.
