@@ -36,4 +36,4 @@ ip dhcp
 
 ## 5. Result
 The DORA process compelted successfully.
-![Output] (./dora-verification.png)
+![Output](./dora.png)
