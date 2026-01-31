@@ -28,3 +28,5 @@ ip 192.168.2.2/24
 ```
 
 **Result:** Success: 5/5 packets received with <1ms latency.
+
+![Output](./ping-verification.png)
