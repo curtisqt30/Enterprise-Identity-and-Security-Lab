@@ -46,37 +46,47 @@ Beyond deployment, this lab serves as a live environment for simulating Help Des
   - Confirmed `Help-Desk` has no read access to sensitive departmental files (Zero Trust).
 - **Automation:** Implemented an **Identity Governance script** to automatically add/remove users from groups based on their "Department" attribute.
 
+### 5. Enterprise Services & Knowledge Management
+- **Scenario:** The IT department required a centralized "Source of Truth" for documentation and a realistic business application to generate network traffic for testing.
+- **Resolution:** Deployed a Services Node (`services01`) using Docker Compose to host internal tools.
+  - **ERP System (Odoo):** Deokiyed an open-source ERP to simulate "Finance" and "Inventory" workflows, creating a realistic applicatino surface for the Help Desk to support.
+  - **Knowledge Base (BookStack):** Self-hosted a wiki platform to centralize SOPs and Incident Reports, migrating away from static Markdown files to a searchable tagged database.
+- **Validation:**
+  - Verified application uptime and connectivity from `CLIENT01`.
+  - Documented the entire lab build process within the self-hosted BookStack instance.
+- **Automation:** Implemented an **Identity Governance script** to automatically add/remove users from groups based on their "Department" attribute.
+
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Hyper-V Host                             │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   ┌─────────────┐    ┌─────────────┐    ┌─────────────┐        │
-│   │    DC01     │    │  CLIENT01   │    │   WAZUH01   │        │
-│   │ Win Server  │    │   Win 10    │    │   Ubuntu    │        │
-│   │ 2022        │    │             │    │   22.04     │        │
-│   │             │    │             │    │             │        │
-│   │ • AD DS     │    │ • Domain    │    │ • Wazuh     │        │
-│   │ • DNS       │◄───│   Joined    │───►│   Manager   │        │
-│   │ • GPO       │    │ • RSAT      │    │ • Dashboard │        │
-│   │ • Audit     │    │ • Agent     │    │ • Indexer   │        │
-│   └─────────────┘    └─────────────┘    └─────────────┘        │
-│         │                   │                  ▲                │
-│         │                   │                  │                │
-│         └───────────────────┼──────────────────┘                │
-│                             │                                   │
-│                     ┌───────▼───────┐                           │
-│                     │    EVE-NG     │                           │
-│                     │  Net Emul.    │                           │
-│                     │ 172.26.11.15  │                           │
-│                     │               │                           │
-│                     │ • Cisco IOS   │                           │
-│                     │ • VLANs/ACLs  │                           │
-│                     │ • Switching   │                           │
-│                     └───────────────┘                           │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          Hyper-V Host                                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐  │
+│   │    DC01     │    │  CLIENT01   │    │   WAZUH01   │    │ SERVICES01  │  │
+│   │ Win Server  │    │   Win 10    │    │   Ubuntu    │    │   Ubuntu    │  │
+│   │ 2022        │    │             │    │   22.04     │    │   22.04     │  │
+│   │             │    │             │    │             │    │             │  │
+│   │ • AD DS     │    │ • Domain    │    │ • Wazuh     │    │ • Docker    │  │
+│   │ • DNS       │◄───│   Joined    │───►│   Manager   │    │ • Odoo ERP  │  │
+│   │ • GPO       │    │ • RSAT      │    │ • Dashboard │    │ • BookStack │  │
+│   │ • Audit     │    │ • Agent     │    │ • Indexer   │    │   (KB)      │  │
+│   └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘  │
+│         │                   │                  ▲                  ▲             │
+│         │                   │                  │                  │             │
+│         └───────────────────┼──────────────────┴──────────────────┘             │
+│                             │                                                   │
+│                     ┌───────▼───────┐                                           │
+│                     │    EVE-NG     │                                           │
+│                     │  Net Emul.    │                                           │
+│                     │ 172.26.11.15  │                                           │
+│                     │               │                                           │
+│                     │ • Cisco IOS   │                                           │
+│                     │ • VLANs/ACLs  │                                           │
+│                     │ • Switching   │                                           │
+│                     └───────────────┘                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 ### Network Infrastructure
 To move beyond a flat network topology, EVE-NG Community Edition has been deployed as a nested hypervisor appliance. This allows for the emulation of enterprise-grade switching and routing hardware alongside the Windows environment.
@@ -99,6 +109,10 @@ To move beyond a flat network topology, EVE-NG Community Edition has been deploy
 | Network Emulation | EVE-NG Community (Bare Metal Kernel 5.17.8) |
 | Scripting | PowerShell, Bash |
 | Version Control | Git |
+| Containerization | Docker, Docker Compose |
+| Business Apps | Odoo ERP |
+| Knowledge Management | BookStack |
+| Databases | PostgreSQL, MariaDB (Dockerized) | 
 
 ## Key Features
 
@@ -131,8 +145,8 @@ To move beyond a flat network topology, EVE-NG Community Edition has been deploy
 │   ├── phase2-identity/        # OUs, users, delegation
 │   ├── phase3-hardening/       # GPO deployment
 │   ├── phase4-siem/            # Wazuh server and agents
-│   └── phase5-network/         # EVE-NG topology and device configs
-
+│   ├── phase5-network/         # EVE-NG topology and device configs
+│   ├── phase6-services/        # BookStack knowledge base and Odoo ERP and Docker
 ├── tests/                      # Validation scripts
 ├── vms/                        # VM storage (gitignored)
 └── Vagrantfile                 # Multi-provider VM definitions
@@ -148,6 +162,7 @@ To move beyond a flat network topology, EVE-NG Community Edition has been deploy
 - **DevSecOps:** Version-controlled infrastructure, repeatable deployments
 - **SIEM Role-Based Access Control (RBAC):** Designing custom indexer roles and tenant mappings to provide secure, restricted visibility.
 - **Granular AD Attribute Delegation:** Mastering the "Delegation of Control" wizard to grant specific rights (pwdLastSet) beyond simple password resets.
+- **Application Lifecycle Management:** Deploying and maintaining containerized web applications (Odoo, BookStack) using Docker Compose and persistent volumes.
 
 ## Lessons Learned
 
