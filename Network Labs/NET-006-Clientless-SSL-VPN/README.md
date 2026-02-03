@@ -10,7 +10,7 @@ The goal of this lab was to implement a **Clientless SSL VPN (WebVPN)** portal t
 * **Remote User Node:** Added a "Coffee Shop" environment (`Remote-User`) connected to the ISP Router (R1) on the `203.0.113.0/24` public subnet.
 * **Routing:** Verified end-to-end IP connectivity from the Remote User to the Firewall Outside interface (`10.0.0.2`).
 
-![Topology with Remote User](./topology_vpn.png)
+![Topology with Remote User](./topology.png)
 
 ## 3. Configuration Details
 
