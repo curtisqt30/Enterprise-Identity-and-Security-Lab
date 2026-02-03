@@ -2,7 +2,6 @@
 
 **Date:** 2026-01-30
 **Lab Environment:** EVE-NG Community Edition
-**Status:** Success
 
 ## 1. Purpose
 To validate the EVE-NG installation and establish basic Layer 2 connectivity between two Virtual PC nodes (VPCS). This lab serves as the "Hello World" verification for the virtual lab environment before attempting complex Cisco IOS routing.

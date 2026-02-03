@@ -2,7 +2,6 @@
 
 **Date:** 2026-01-31
 **Lab Environment:** EVE-NG Community Edition
-**Status:** Success
 
 ## 1. Purpose
 To validate external connectivity by connecting a Virtual PC (VPCS) to the Management Cloud interface. This lab tests the ability of virtual nodes to pull dynamic IP addresses via DHCP from the external physical network and establishes the "Bridge" required for future package updates and internet access.

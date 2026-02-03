@@ -13,6 +13,8 @@ This lab simulates a Small-to-Medium Business (SMB) network using a "Router-on-a
     * **IT-PC (VLAN 20):** Subnet `192.168.20.0/24`
 * **WAN Connection:** NAT Cloud bridging the virtual lab to the physical internet.
 
+![Network Topology](./topology.png)
+
 ## 3. Configuration Details
 
 ### A. Switch Configuration (Layer 2)
