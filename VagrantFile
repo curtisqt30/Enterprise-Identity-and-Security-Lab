@@ -3,6 +3,9 @@
 
 Vagrant.configure("2") do |config|
 
+  # ============================================
+  # GLOBAL SETTINGS
+  # ============================================ 
   # Global Timeout for Windows (it takes a while to boot)
   config.vm.boot_timeout = 1200
 
@@ -16,17 +19,6 @@ Vagrant.configure("2") do |config|
     dc.vm.box = "gusztavvargadr/windows-server-2022-standard"
     dc.vm.hostname = "DC01"
 
-    # VirtualBox provider
-    dc.vm.provider "virtualbox" do |vb|
-      vb.name = "DC01-Server2022"
-      vb.memory = "4096"
-      vb.cpus = 2
-      vb.gui = true
-      vb.customize ["modifyvm", :id, "--vram", "128"]
-      vb.customize ["modifyvm", :id, "--clipboard-mode", "bidirectional"]
-    end
-
-    # Hyper-V provider
     dc.vm.provider "hyperv" do |hv|
       hv.vmname = "DC01-Server2022"
       hv.memory = "4096"
@@ -35,12 +27,8 @@ Vagrant.configure("2") do |config|
       hv.linked_clone = true
     end
 
-    # Network config per provider
-    dc.vm.provider "virtualbox" do |vb, override|
-      override.vm.network "private_network", ip: "192.168.56.10", virtualbox__intnet: "LabNet"
-    end
-
-    dc.vm.provision "shell", path: "scripts/phase1-infrastructure/01-dc-setup.ps1"
+    # DISABLED FOR MANUAL LAB (Uncomment to auto-build later)
+    # dc.vm.provision "shell", path: "scripts/phase1-infrastructure/01-dc-setup.ps1"
   end
 
   # ============================================
@@ -50,16 +38,6 @@ Vagrant.configure("2") do |config|
     client.vm.box = "gusztavvargadr/windows-10"
     client.vm.hostname = "CLIENT01"
 
-    # VirtualBox provider
-    client.vm.provider "virtualbox" do |vb|
-      vb.name = "CLIENT01-Win10"
-      vb.memory = "2048"
-      vb.cpus = 2
-      vb.gui = true
-      vb.customize ["modifyvm", :id, "--vram", "128"]
-    end
-
-    # Hyper-V provider
     client.vm.provider "hyperv" do |hv|
       hv.vmname = "CLIENT01-Win10"
       hv.memory = "2048"
@@ -67,12 +45,8 @@ Vagrant.configure("2") do |config|
       hv.linked_clone = true
     end
 
-    # Network config per provider
-    client.vm.provider "virtualbox" do |vb, override|
-      override.vm.network "private_network", ip: "192.168.56.100", virtualbox__intnet: "LabNet"
-    end
-
-    client.vm.provision "shell", path: "scripts/phase1-infrastructure/02-client-setup.ps1"
+    # DISABLED FOR MANUAL LAB
+    # client.vm.provision "shell", path: "scripts/phase1-infrastructure/02-client-setup.ps1"
   end
 
   # ============================================
@@ -82,26 +56,12 @@ Vagrant.configure("2") do |config|
     wazuh.vm.box = "generic/ubuntu2204"
     wazuh.vm.hostname = "wazuh01"
 
-    # VirtualBox provider
-    wazuh.vm.provider "virtualbox" do |vb|
-      vb.name = "WAZUH01-Ubuntu"
-      vb.memory = "4096"
-      vb.cpus = 2
-      vb.gui = false
-    end
-
-    # Hyper-V provider
     wazuh.vm.provider "hyperv" do |hv|
       hv.vmname = "WAZUH01-Ubuntu"
       hv.memory = "4096"
       hv.maxmemory = "4096"
       hv.cpus = 2
       hv.linked_clone = true
-    end
-
-    # Network config per provider
-    wazuh.vm.provider "virtualbox" do |vb, override|
-      override.vm.network "private_network", ip: "192.168.56.20", virtualbox__intnet: "LabNet"
     end
 
     wazuh.vm.provision "shell", path: "scripts/phase4-siem/01-wazuh-server-setup.sh"
@@ -111,62 +71,38 @@ Vagrant.configure("2") do |config|
   # EVE-NG Community (Ubuntu 20.04 Base)
   # ============================================
   config.vm.define "eveng" do |eve|
-    # EVE-NG is built on Ubuntu 20.04 LTS (Focal Fossa)
     eve.vm.box = "generic/ubuntu2004"
     eve.vm.hostname = "eve-ng"
 
-    # VirtualBox provider
-    eve.vm.provider "virtualbox" do |vb|
-      vb.name = "EVE-NG-Community"
-      vb.memory = "8192" # Needs 8GB+ for labbing
-      vb.cpus = 4        # Needs 4+ vCPUs
-      vb.gui = true      # GUI needed to see IP on console if network breaks
-      # Enable Nested Virtualization (Crucial for running VMs inside VMs)
-      vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
-      # Enable Promiscuous mode for bridging
-      vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
-    end
-
-    # Hyper-V provider (Recommended)
     eve.vm.provider "hyperv" do |hv|
       hv.vmname = "EVE-NG-Community"
       hv.memory = "8192"
       hv.maxmemory = "16384" # Allow dynamic expansion
       hv.cpus = 4
-      # Enable Nested Virtualization
       hv.enable_virtualization_extensions = true 
       hv.linked_clone = true
-      # Mac Address Spoofing is often required for nested networking in Hyper-V
-      # You may need to enable this manually in Hyper-V settings if bridges fail
     end
-
-    # Network config
-    # EVE-NG needs a dedicated IP to act as the web server
-    eve.vm.provider "virtualbox" do |vb, override|
-      override.vm.network "private_network", ip: "192.168.56.50", virtualbox__intnet: "LabNet"
-    end
-    
-    # Note: For Hyper-V, Vagrant usually relies on the default switch or an external switch.
-    # Ensure this VM is attached to the same switch as DC01 manually if they can't ping.
   end
 
-    # --- Services Node (Docker Host for KB & ERP) ---
+  # ============================================
+  # Services Node (Docker Host for KB & ERP)
+  # ============================================
   config.vm.define "services01" do |svc|
     svc.vm.box = "generic/ubuntu2204"
     svc.vm.hostname = "services01"
     
-    # Give it a static IP on your Lab Network (Adjust IP to match your subnet!)
-    svc.vm.network "private_network", ip: "192.168.56.20" 
-    
+    # Static IP setup for Hyper-V often requires external switch config
+    # Vagrant will attempt to configure this if the switch supports it
+    svc.vm.network "public_network", bridge: "Default Switch"
+
     svc.vm.provider "hyperv" do |hv|
       hv.vmname = "Lab-Services01"
-      hv.memory = 2048 # 2GB RAM is plenty for Docker
+      hv.memory = 2048 
       hv.cpus = 2
-      # Enable nested virtualization if creating containers
       hv.enable_virtualization_extensions = true
     end
 
-    # Provisioning: Install Docker & Docker Compose immediately
+    # Docker Installation (Kept active as it's utility, not AD)
     svc.vm.provision "shell", inline: <<-SHELL
       apt-get update
       apt-get install -y ca-certificates curl gnupg
@@ -179,4 +115,5 @@ Vagrant.configure("2") do |config|
       usermod -aG docker vagrant
     SHELL
   end
+
 end
