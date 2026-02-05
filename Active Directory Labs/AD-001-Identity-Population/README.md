@@ -48,9 +48,13 @@ foreach ($Name in $Names) {
 
 ## 4. Verification
 - **Structure Validation:** Verified in **Active Directory Users and Computers (ADUC)** that the `Employees` OU was created with all sub-department folders.
+
 ![ADUC](./ADUC.png)
+
 - **Group Membership:** Checked the `G_IT` group properties to confirm that users assigned to the IT department were automatically added as members.
+
 ![Group Properties](./Group-Properties.png)
+
 - **Login Test:** Validated that a newly created user (e.g., `James.Smith`) could successfully authenticate against the domain.
 
 ## 5. Verification
