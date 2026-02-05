@@ -1,9 +1,9 @@
-# Project: AD-002-Identity-Population
+# Project: AD-001-Identity-Population
 **Date:** February 2026
 **Platform:** Windows Server 2022 (PowerShell ISE)
 
 ## 1. Project Overview
-With the Active Directory infrastructure established (AD-001), the environment was functionally empty. To simulate a realistic enterprise environment for security monitoring, I needed to populate the directory with a diverse workforce. Instead of manually creating users one by one, I utilized **PowerShell Automation** to architect a standard Organizational Unit (OU) hierarchy, generate Security Groups, and onboard 20+ synthetic users with realistic attributes.
+With the Active Directory infrastructure established (AD-000), the environment was functionally empty. To simulate a realistic enterprise environment for security monitoring, I needed to populate the directory with a diverse workforce. Instead of manually creating users one by one, I utilized **PowerShell Automation** to architect a standard Organizational Unit (OU) hierarchy, generate Security Groups, and onboard 20+ synthetic users with realistic attributes.
 
 ## 2. Directory Design
 * **Root:** `corp.local`
