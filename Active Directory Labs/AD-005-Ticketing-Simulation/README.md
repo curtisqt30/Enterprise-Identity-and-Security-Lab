@@ -6,7 +6,7 @@
 * **User:** James Smith (VIP User / Finance Dept)
 * **Issue:** User reported inability to log in to their workstation.
 * **Environment:**
-    * **Identity Provider:** Windows Server 2019 Active Directory (`CORP.LOCAL`)
+    * **Identity Provider:** Windows Server 2022 Active Directory (`CORP.LOCAL`)
     * **ERP/Ticketing:** Odoo v16 (Project/Helpdesk Module)
     * **Workstation:** Windows 10 Enterprise
     * **Security Tool:** Wazuh SIEM (Monitoring Login Failures)
