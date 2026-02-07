@@ -8,7 +8,7 @@
 * **Environment:**
     * **Identity Provider:** Windows Server 2022 Active Directory (`CORP.LOCAL`)
     * **ERP/Ticketing:** Odoo v16 (Project/Helpdesk Module)
-    * **Workstation:** Windows 10 Enterprise
+    * **Workstation:** Windows 10 Enterprise (`CLIENT01`)
     * **Security Tool:** Wazuh SIEM (Monitoring Login Failures)
 
 ### 2. Issue Simulation & Verification
@@ -19,7 +19,7 @@ The "Account Lockout" policy was triggered on the Domain Controller to replicate
 > **Exhibit A: User Lockout Message**
 >
 > ![User Locked Out Screen](./lockout.png)
-> 
+>
 >*Figure 1: Workstation error message explicitly stating "The referenced account is currently locked out."*
 
 ### 3. Incident Management (Ticketing)
@@ -37,17 +37,32 @@ Upon verification of the user's identity, a support ticket was generated in the 
 * **Ticket Details:**
     * **Subject:** `User Locked Out - James Smith`
     * **Priority:** High (Work Stoppage)
-    * **Assignee:** Mitchell Admin (IT Support)
+    * **Assignee:** Jennifer Davis (IT Support)
 
 > **Exhibit C: Ticket Documentation**
 > ![Ticket Details](./ticket.png)
-> *Figure 3: The active ticket record containing the user's report and triage details.*
+> *Figure 3: The active ticket record containing the user's initial report and triage details.*
 
-### 4. Resolution & Closure
-1.  **Administrative Action:** Accessed **Active Directory Users and Computers (ADUC)** on the Domain Controller.
-2.  **Fix:** Located the `James.Smith` object $\rightarrow$ **Account Tab** $\rightarrow$ Checked **"Unlock Account."**
-3.  **Verification:** User successfully logged in to the workstation.
-4.  **Documentation:** Ticket `User Locked Out` was updated with resolution notes and moved to the **Resolved** stage.
+### 4. Investigation & Resolution Workflow
+To ensure security compliance, the resolution followed a strict **Verify $\rightarrow$ Analyze $\rightarrow$ Remediate** workflow rather than a simple password reset.
+
+1.  **SIEM Analysis (Wazuh):**
+    * Retrieved logs confirming Event ID 4740 (Account Lockout).
+    * **Finding:** Lockout originated from `CLIENT01`, ruling out external brute-force attacks.
+    ![Wazuh](./wazuh.png)
+2.  **User Verification:**
+    * Contacted James Smith to confirm the activity.
+    * **Outcome:** User admitted to forgetting their new password; validated as user error.
+3.  **Remediation:**
+    * Unlocked account in Active Directory and guided user through password reset policy.
+4.  **SOP Adherence:**
+    * Linked the relevant Standard Operating Procedure (SOP) to the ticket for audit trails.
+    * Closed ticket only after user confirmed successful login.
+    ![SOP](./SOP.png)
+
+> **Exhibit D: Investigation Log & SOP Compliance**
+> ![Investigation Log](./lognote.png)
+> *Figure 4: Detailed activity log showing Wazuh analysis, user verification, and the link to the internal SOP (Standard Operating Procedure).*
 
 ### 5. Conclusion
-This lab demonstrates the integration between **Technical Execution** (AD Administration) and **Business Process** (ERP Ticketing). The workflow mimics real-world SLA requirements where every administrative action must be logged and tracked for audit purposes.
+This lab demonstrates the integration between **Technical Execution** (AD Administration) and **Business Process** (ERP Ticketing). The workflow mimics real-world SOC standards where every administrative action must be justified by forensic evidence (Wazuh logs) and user verification before execution.
