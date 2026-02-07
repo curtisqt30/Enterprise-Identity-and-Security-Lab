@@ -21,6 +21,7 @@ The "Account Lockout" policy was triggered on the Domain Controller to replicate
 * **Evidence:** The user attempted to authenticate, resulting in a specific security error message confirming the account status in Active Directory.
 
 > **Exhibit A: User Lockout Message**
+>
 > ![User Locked Out Screen](./lockout.png)
 > *Figure 1: Workstation error message explicitly stating "The referenced account is currently locked out."*
 
