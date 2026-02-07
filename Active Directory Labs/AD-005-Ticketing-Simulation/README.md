@@ -1,9 +1,7 @@
 # Lab Report: AD-005 - IT Helpdesk Ticketing Simulation
 
-**Date:** February 6, 2026
-**Operator:** Curtis Quan Tran
-**Objective:** Simulate a Tier 1 Identity Management incident (Account Lockout) and execute the standard ITIL support workflow using Odoo ERP and Active Directory.
-
+**Date:** 
+**Platform**: Windows Server 2022, RSAT (Windows 10), Odoo
 ---
 
 ### 1. Scenario Overview
@@ -23,7 +21,7 @@ The "Account Lockout" policy was triggered on the Domain Controller to replicate
 * **Evidence:** The user attempted to authenticate, resulting in a specific security error message confirming the account status in Active Directory.
 
 > **Exhibit A: User Lockout Message**
-> ![User Locked Out Screen](./lockout.png.jpg)
+> ![User Locked Out Screen](./lockout.png)
 > *Figure 1: Workstation error message explicitly stating "The referenced account is currently locked out."*
 
 ---
@@ -37,7 +35,7 @@ Upon verification of the user's identity, a support ticket was generated in the 
     * **Resolved:** Verified fixes.
 
 > **Exhibit B: Helpdesk Pipeline**
-> ![Odoo Kanban Board](./kanban.png.png)
+> ![Odoo Kanban Board](./kanban.png)
 > *Figure 2: The IT Helpdesk Kanban board configured with standard support stages.*
 
 * **Ticket Details:**
